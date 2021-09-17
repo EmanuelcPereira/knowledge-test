@@ -1,16 +1,33 @@
-const { badRequest } = require('../../utils/http/http-helper');
-
+const { badRequest, noContent, serverError } = require('../../utils/http/http-helper');
 
 module.exports = class CreatePurchaseOrdersController {
-    constructor(validation) {
+    constructor(repository, validation) {
+        this.repository = repository;
         this.validation = validation;
     }
 
     async handle(request) {
-        const errors = await this.validation.validate(request.body);
-        if (errors.length > 0) {
-            return badRequest(errors);
+        try {
+            const errors = await this.validation.validate(request.body);
+            if (errors.length > 0) {
+                return badRequest(errors);
+            }
+
+            const serializePurchaseOrdersToDb = this.serializePurchaseOrdersToDb(request.body);
+            await this.repository.create(serializePurchaseOrdersToDb);
+            return noContent();
+        } catch (error) {
+            return serverError(error);
         }
-        return new Promise(resolve => resolve(null));
+    }
+
+    serializePurchaseOrdersToDb(purchaseOrders) {
+        purchaseOrders = Array.isArray(purchaseOrders) ? purchaseOrders : [purchaseOrders];
+
+        return purchaseOrders.map(purchaseOrder => ([
+            purchaseOrder.product_id,
+            purchaseOrder.price,
+            purchaseOrder.deletion_flag,
+        ]));
     }
 };
