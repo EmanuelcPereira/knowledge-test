@@ -46,4 +46,10 @@ describe('', () => {
         const httpResponse = await sut.handle(mockRequest());
         expect(httpResponse).toEqual(noContent());
     });
+
+    it('should call PurchaseOrderRepository delete() with correct values', async () => {
+        const { sut, purchaseOrderRepositorySpy } = makeSut();
+        await sut.handle(mockRequest());
+        expect(purchaseOrderRepositorySpy.id).toEqual(mockRequest().params);
+    });
 });
