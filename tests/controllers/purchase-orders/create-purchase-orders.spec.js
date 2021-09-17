@@ -66,4 +66,10 @@ describe('CreatePurchaseOrder Controller', () => {
         const httpResponse = await sut.handle(mockRequest());
         expect(httpResponse).toEqual(noContent());
     });
+
+    it('should return 204 on array success', async () => {
+        const { sut } = makeSut();
+        const httpResponse = await sut.handle(mockArrayRequest());
+        expect(httpResponse).toEqual(noContent());
+    });
 });
