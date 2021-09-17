@@ -3,7 +3,8 @@ const ValidationSpy = require('../mocks/mock-validation');
 const DeletePurchaseOrderController = require('../../../src/controllers/purchase-orders/delete-purchase-order');
 const MissingParamError = require('../../../src/utils/errors/missing-param');
 const faker = require('faker');
-const { badRequest, noContent } = require('../../../src/utils/http/http-helper');
+const { badRequest, noContent, serverError } = require('../../../src/utils/http/http-helper');
+const ServerError = require('../../../src/utils/errors/server');
 
 const mockOrder = () => ({
     id: 'valid_purchase_order_id',
@@ -51,5 +52,14 @@ describe('', () => {
         const { sut, purchaseOrderRepositorySpy } = makeSut();
         await sut.handle(mockRequest());
         expect(purchaseOrderRepositorySpy.id).toEqual(mockRequest().params);
+    });
+
+    it('should return 500 if PurchaseOrderRepository delete() throws', async () => {
+        const { sut, purchaseOrderRepositorySpy } = makeSut();
+        jest.spyOn(purchaseOrderRepositorySpy, 'delete').mockImplementationOnce(() => {
+            throw new Error();
+        });
+        const httpResponse = await sut.handle(mockRequest());
+        expect(httpResponse).toEqual(serverError(new ServerError(null)));
     });
 });
