@@ -3,8 +3,9 @@ const faker = require('faker');
 const ValidationSpy = require('../mocks/mock-validation');
 const CreatePurchaseOrdersController = require('../../../src/controllers/purchase-orders/create-purchase-orders');
 const MissingParamError = require('../../../src/utils/errors/missing-param');
-const { badRequest, noContent } = require('../../../src/utils/http/http-helper');
+const { badRequest, noContent, serverError } = require('../../../src/utils/http/http-helper');
 const PurchaseOrderRepositorySpy = require('../mocks/mock-purchase-orders-repository');
+const ServerError = require('../../../src/utils/errors/server');
 
 const mockProduct = () => ({
     product_id: 'valid_product_id',
@@ -78,5 +79,14 @@ describe('CreatePurchaseOrder Controller', () => {
         const request = mockRequest();
         await sut.handle(request);
         expect(purchaseOrderRepositorySpy.params).toEqual(sut.serializePurchaseOrdersToDb(request.body));
+    });
+
+    it('should return 500 if PurchaseOrderRepository create() throws', async () => {
+        const { sut, purchaseOrderRepositorySpy } = makeSut();
+        jest.spyOn(purchaseOrderRepositorySpy, 'create').mockImplementationOnce(() => {
+            throw new Error();
+        });
+        const httpResponse = await sut.handle(mockRequest());
+        expect(httpResponse).toEqual(serverError(new ServerError(null)));
     });
 });
