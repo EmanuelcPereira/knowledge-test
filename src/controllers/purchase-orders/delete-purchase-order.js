@@ -1,3 +1,4 @@
+const { badRequest } = require('../../utils/http/http-helper');
 
 
 module.exports = class DeletePurchaseOrderController {
@@ -7,7 +8,10 @@ module.exports = class DeletePurchaseOrderController {
     }
 
     async handle(request) {
-        await this.validation.validate(request.params);
+        const error = await this.validation.validate(request.params);
+        if (error) {
+            return badRequest(error);
+        }
         return new Promise(resolve => resolve(null));
     }
 };
