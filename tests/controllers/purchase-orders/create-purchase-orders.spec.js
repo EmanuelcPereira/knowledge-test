@@ -16,6 +16,15 @@ const mockRequest = () => {
     };
 };
 
+const mockArrayRequest = () => {
+    return {
+        body: [
+            mockProduct(),
+            mockProduct(),
+        ]
+    };
+};
+
 const makeSut = () => {
     const validationSpy = new ValidationSpy();
     const sut = new CreatePurchaseOrdersController(validationSpy);
@@ -38,6 +47,13 @@ describe('CreatePurchaseOrder Controller', () => {
         const { sut, validationSpy } = makeSut();
         validationSpy.error = [new MissingParamError(faker.random.word())];
         const httpResponse = await sut.handle(mockRequest());
+        expect(httpResponse).toEqual(badRequest(validationSpy.error));
+    });
+
+    it('should return 400 if validation return an error array', async () => {
+        const { sut, validationSpy } = makeSut();
+        validationSpy.error = [new MissingParamError(faker.random.word())];
+        const httpResponse = await sut.handle(mockArrayRequest());
         expect(httpResponse).toEqual(badRequest(validationSpy.error));
     });
 });
