@@ -3,11 +3,13 @@ const faker = require('faker');
 const ValidationSpy = require('../mocks/mock-validation');
 const CreatePurchaseOrdersController = require('../../../src/controllers/purchase-orders/create-purchase-orders');
 const MissingParamError = require('../../../src/utils/errors/missing-param');
-const { badRequest } = require('../../../src/utils/http/http-helper');
+const { badRequest, noContent } = require('../../../src/utils/http/http-helper');
+const PurchaseOrderRepositorySpy = require('../mocks/mock-purchase-orders-repository');
 
 const mockProduct = () => ({
-    description: 'valid_description',
-    supplier_id: 'valid_supplier_id',
+    product_id: 'valid_product_id',
+    price: 'valid_price',
+    deletion_flag: 'valid_deletion_flag'
 });
 
 const mockRequest = () => {
@@ -27,11 +29,13 @@ const mockArrayRequest = () => {
 
 const makeSut = () => {
     const validationSpy = new ValidationSpy();
-    const sut = new CreatePurchaseOrdersController(validationSpy);
+    const purchaseOrderRepositorySpy = new PurchaseOrderRepositorySpy();
+    const sut = new CreatePurchaseOrdersController(purchaseOrderRepositorySpy, validationSpy);
 
     return {
         sut,
         validationSpy,
+        purchaseOrderRepositorySpy,
     };
 };
 
@@ -55,5 +59,11 @@ describe('CreatePurchaseOrder Controller', () => {
         validationSpy.error = [new MissingParamError(faker.random.word())];
         const httpResponse = await sut.handle(mockArrayRequest());
         expect(httpResponse).toEqual(badRequest(validationSpy.error));
+    });
+
+    it('should return 204 on success', async () => {
+        const { sut } = makeSut();
+        const httpResponse = await sut.handle(mockRequest());
+        expect(httpResponse).toEqual(noContent());
     });
 });
