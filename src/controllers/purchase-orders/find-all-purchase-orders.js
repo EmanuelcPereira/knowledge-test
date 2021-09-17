@@ -1,4 +1,4 @@
-const { success } = require('../../utils/http/http-helper');
+const { success, serverError } = require('../../utils/http/http-helper');
 
 
 module.exports = class FindAllPurchaseOrdersController {
@@ -7,7 +7,11 @@ module.exports = class FindAllPurchaseOrdersController {
     }
 
     async handle() {
-        const purchaseOrders = await this.repository.findAll();
-        return success({ purchaseOrders });
+        try {
+            const purchaseOrders = await this.repository.findAll();
+            return success({ purchaseOrders });
+        } catch (error) {
+            return serverError(error);
+        }
     }
 };
