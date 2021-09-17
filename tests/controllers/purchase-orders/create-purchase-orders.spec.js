@@ -72,4 +72,11 @@ describe('CreatePurchaseOrder Controller', () => {
         const httpResponse = await sut.handle(mockArrayRequest());
         expect(httpResponse).toEqual(noContent());
     });
+
+    it('should call PurchaseOrderRepository create() with correct values', async () => {
+        const { sut, purchaseOrderRepositorySpy } = makeSut();
+        const request = mockRequest();
+        await sut.handle(request);
+        expect(purchaseOrderRepositorySpy.params).toEqual(sut.serializePurchaseOrdersToDb(request.body));
+    });
 });
