@@ -1,6 +1,9 @@
 const PurchaseOrdersRepositorySpy = require('../mocks/mock-purchase-orders-repository');
 const ValidationSpy = require('../mocks/mock-validation');
 const DeletePurchaseOrderController = require('../../../src/controllers/purchase-orders/delete-purchase-order');
+const MissingParamError = require('../../../src/utils/errors/missing-param');
+const faker = require('faker');
+const { badRequest } = require('../../../src/utils/http/http-helper');
 
 const mockOrder = () => ({
     id: 'valid_purchase_order_id',
@@ -29,5 +32,12 @@ describe('', () => {
         const request = mockRequest();
         await sut.handle(request);
         expect(validationSpy.input).toEqual(request.params);
+    });
+
+    it('should return 400 if validation return an error', async () => {
+        const { sut, validationSpy } = makeSut();
+        validationSpy.error = [new MissingParamError(faker.random.word())];
+        const httpResponse = await sut.handle(mockRequest());
+        expect(httpResponse).toEqual(badRequest(validationSpy.error));
     });
 });
