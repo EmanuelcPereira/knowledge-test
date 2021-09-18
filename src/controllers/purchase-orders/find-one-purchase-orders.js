@@ -1,4 +1,4 @@
-const { badRequest, success } = require('../../utils/http/http-helper');
+const { badRequest, success, serverError } = require('../../utils/http/http-helper');
 
 
 module.exports = class FindOnePurchaseOrdersController {
@@ -8,11 +8,15 @@ module.exports = class FindOnePurchaseOrdersController {
     }
 
     async handle(request) {
-        const error = await this.validation.validate(request.params);
-        if (error.length > 0) {
-            return badRequest(error);
+        try {
+            const error = await this.validation.validate(request.params);
+            if (error.length > 0) {
+                return badRequest(error);
+            }
+            const purchaseOrder = await this.repository.findOne(request.params);
+            return success({ purchaseOrder });
+        } catch (error) {
+            return serverError(error);
         }
-        const purchaseOrder = await this.repository.findOne(request.params);
-        return success({ purchaseOrder });
     }
 };
