@@ -3,6 +3,11 @@ module.exports = class PurchaseOrdersRepositorySpy {
         this.result = 0;
     }
 
+    async findOne(id) {
+        this.id = id;
+        return this.result;
+    }
+
     async findAll() {
         return this.result;
     }
