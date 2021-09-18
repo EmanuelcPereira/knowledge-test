@@ -2,8 +2,9 @@ const PurchaseOrdersRepositorySpy = require('../mocks/mock-purchase-orders-repos
 const FindOnePurchaseOrdersController = require('../../../src/controllers/purchase-orders/find-one-purchase-orders');
 const ValidationSpy = require('../mocks/mock-validation');
 const MissingParamError = require('../../../src/utils/errors/missing-param');
-const { badRequest, success } = require('../../../src/utils/http/http-helper');
+const { badRequest, success, serverError } = require('../../../src/utils/http/http-helper');
 const faker = require('faker');
+const ServerError = require('../../../src/utils/errors/server');
 
 const mockOrder = () => ({
     id: 'valid_purchase_order_id',
@@ -46,5 +47,14 @@ describe('FindOnePurchaseOrders Controller', () => {
         purchaseOrderRepositorySpy.result = [];
         const httpResponse = await sut.handle(mockRequest());
         expect(httpResponse).toEqual(success({ purchaseOrder: [] }));
+    });
+
+    it('should return 500 if PurchaseOrderRepository findOne() throws', async () => {
+        const { sut, purchaseOrderRepositorySpy } = makeSut();
+        jest.spyOn(purchaseOrderRepositorySpy, 'findOne').mockImplementationOnce(() => {
+            throw new Error();
+        });
+        const httpResponse = await sut.handle();
+        expect(httpResponse).toEqual(serverError(new ServerError(null)));
     });
 });
