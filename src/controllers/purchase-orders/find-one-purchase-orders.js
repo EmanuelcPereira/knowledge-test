@@ -1,4 +1,4 @@
-const { badRequest } = require('../../utils/http/http-helper');
+const { badRequest, success } = require('../../utils/http/http-helper');
 
 
 module.exports = class FindOnePurchaseOrdersController {
@@ -12,6 +12,7 @@ module.exports = class FindOnePurchaseOrdersController {
         if (error.length > 0) {
             return badRequest(error);
         }
-        return null;
+        const purchaseOrder = await this.repository.findOne(request.params);
+        return success({ purchaseOrder });
     }
 };
