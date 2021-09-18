@@ -42,6 +42,13 @@ describe('DeletePurchaseOrders Controller', () => {
         expect(httpResponse).toEqual(badRequest(validationSpy.error));
     });
 
+    it('should return 500 if PurchaseOrderRepository findOne() throws', async () => {
+        const { sut, purchaseOrderRepositorySpy } = makeSut();
+        jest.spyOn(purchaseOrderRepositorySpy, 'findOne').mockReturnValueOnce(new Promise(resolve => resolve(null)));
+        const httpResponse = await sut.handle(mockRequest().params);
+        expect(httpResponse).toEqual(badRequest(null));
+    });
+
     it('should return 204 on success', async () => {
         const { sut } = makeSut();
         const httpResponse = await sut.handle(mockRequest());
