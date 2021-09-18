@@ -13,6 +13,12 @@ module.exports = class DeletePurchaseOrderController {
             if (error.length > 0) {
                 return badRequest(error);
             }
+
+            const purchaseOrder = await this.repository.findOne(request.params);
+            if (purchaseOrder === null) {
+                return badRequest(purchaseOrder);
+            }
+
             await this.repository.delete(request.params);
             return noContent();
         } catch (error) {
