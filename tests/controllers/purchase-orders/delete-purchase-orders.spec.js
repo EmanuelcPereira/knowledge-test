@@ -27,7 +27,7 @@ const makeSut = () => {
     };
 };
 
-describe('', () => {
+describe('DeletePurchaseOrders Controller', () => {
     it('should call validation with correct values', async () => {
         const { sut, validationSpy } = makeSut();
         const request = mockRequest();
