@@ -1,5 +1,5 @@
 const { badRequest, noContent, serverError } = require('../../utils/http/http-helper');
-
+const ServerError = require('../../../src/utils/errors/server');
 
 module.exports = class DeletePurchaseOrderController {
     constructor(repository, validation) {
@@ -9,20 +9,15 @@ module.exports = class DeletePurchaseOrderController {
 
     async handle(request) {
         try {
-            const error = await this.validation.validate(request.params);
-            if (error.length > 0) {
-                return badRequest(error);
+            const errors = await this.validation.validate(request.route);
+            if (errors.length > 0) {
+                console.log(errors);
+                return badRequest(errors);
             }
-
-            const purchaseOrder = await this.repository.findOne(request.params);
-            if (purchaseOrder === null) {
-                return badRequest(purchaseOrder);
-            }
-
-            await this.repository.delete(request.params);
+            await this.repository.delete(request.route.id);
             return noContent();
         } catch (error) {
-            return serverError(error);
+            return serverError(new ServerError(null));
         }
     }
 };
