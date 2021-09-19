@@ -14,6 +14,11 @@ module.exports = class DeletePurchaseOrderController {
                 console.log(errors);
                 return badRequest(errors);
             }
+
+            const purchaseOrder = await this.repository.findOne(request.route);
+            if (purchaseOrder === null) {
+                return badRequest(null);
+            }
             await this.repository.delete(request.route.id);
             return noContent();
         } catch (error) {
