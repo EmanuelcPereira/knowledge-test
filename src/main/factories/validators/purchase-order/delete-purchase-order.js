@@ -8,7 +8,7 @@ const getMandatoryFields = () => [
 ];
 
 const getSchema = () => ({
-    id: value => typeof value === 'number',
+    id: value => typeof value === 'string',
 });
 
 module.exports = () => {
