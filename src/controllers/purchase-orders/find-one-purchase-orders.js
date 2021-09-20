@@ -14,7 +14,7 @@ module.exports = class FindOnePurchaseOrdersController {
                 return badRequest(error);
             }
             const purchaseOrder = await this.repository.findOne(request.route.id);
-            return success(purchaseOrder);
+            return success({ purchaseOrder });
         } catch (error) {
             return serverError(error);
         }
