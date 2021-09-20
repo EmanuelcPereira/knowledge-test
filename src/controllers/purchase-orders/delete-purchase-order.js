@@ -11,13 +11,12 @@ module.exports = class DeletePurchaseOrderController {
         try {
             const errors = await this.validation.validate(request.route);
             if (errors.length > 0) {
-                console.log(errors);
                 return badRequest(errors);
             }
 
-            const purchaseOrder = await this.repository.findOne(request.route);
-            if (purchaseOrder === null) {
-                return badRequest(null);
+            const purchaseOrder = await this.repository.findOne(request.route.id);
+            if (purchaseOrder.length === 0) {
+                return badRequest('Id not found');
             }
             await this.repository.delete(request.route.id);
             return noContent();
