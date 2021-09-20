@@ -9,12 +9,12 @@ module.exports = class FindOnePurchaseOrdersController {
 
     async handle(request) {
         try {
-            const error = await this.validation.validate(request.params);
+            const error = await this.validation.validate(request.route);
             if (error.length > 0) {
                 return badRequest(error);
             }
-            const purchaseOrder = await this.repository.findOne(request.params);
-            return success({ purchaseOrder });
+            const purchaseOrder = await this.repository.findOne(request.route.id);
+            return success(purchaseOrder);
         } catch (error) {
             return serverError(error);
         }
