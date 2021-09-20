@@ -4,6 +4,7 @@ jest.mock('../../src/main/factories/db', () => {
     return () => ({
         persistMany: () => mockCreatePurchaseOrdersParams().length,
         persist: () => mockDeletePurchaseOrdersParams().length,
+        select: () => mockFindOnePurchaseOrdersParams().length,
         select: () => []
     });
 });
@@ -15,6 +16,10 @@ const mockCreatePurchaseOrdersParams = () => ([[
 ]]);
 
 const mockDeletePurchaseOrdersParams = () => ([[
+    'valid_purchaseOrder_id',
+]]);
+
+const mockFindOnePurchaseOrdersParams = () => ([[
     'valid_purchaseOrder_id',
 ]]);
 
@@ -39,6 +44,16 @@ describe('ProductsRepository', () => {
             expect(purchaseOrders).toEqual([]);
         });
     });
+
+    describe('findOne()', () => {
+        it('should return order data', async () => {
+            const sut = makeSut();
+            const params = mockFindOnePurchaseOrdersParams();
+            const purchaseOrders = await sut.findOne(params);
+            expect(purchaseOrders).toEqual([]);
+        });
+    });
+
 
     describe('delete()', () => {
         it('should set deletion_flag to 1', async () => {
