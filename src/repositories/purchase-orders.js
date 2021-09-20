@@ -44,4 +44,30 @@ module.exports = class PurchaseOrdersRepository {
 
         return db.persist(sql, id);
     }
+
+    async findOne(id) {
+        const sql = `
+        SELECT
+            purchase_orders.id,
+            product_id, 
+            price, 
+            description, 
+            name, 
+            country
+        FROM 
+            purchase_orders,
+            products,
+            suppliers
+        WHERE 
+            purchase_orders.id = ${id}
+        AND
+            purchase_orders.product_id = products.id
+        AND
+            products.supplier_id = suppliers.id
+        `;
+
+        const purchase_orders = await db.select(sql);
+
+        return purchase_orders;
+    }
 };
